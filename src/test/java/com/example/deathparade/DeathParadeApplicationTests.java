@@ -5,12 +5,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class DeathParadeApplicationTests {
-	/**.
-	 * tests will be there but later
-	 */
-	
+
+
 	@Test
 	void contextLoads() {
+		/* this file is temporary empty*/
 	}
 
 }

@@ -9,7 +9,7 @@ public class Coffin {
   public final String outsideMaterial;
   public final String insideMaterial;
   public final String insideColor;
-  public CoffinParameters parameters;
+  public static CoffinParameters parameters;
   public final int cost;
   /**.
    *

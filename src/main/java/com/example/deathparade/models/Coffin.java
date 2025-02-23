@@ -5,7 +5,7 @@ package com.example.deathparade.models;
  */
 
 public class Coffin {
-  public String outsideColor;
+  public final String outsideColor;
   public String outsideMaterial;
   public String insideMaterial;
   public String insideColor;

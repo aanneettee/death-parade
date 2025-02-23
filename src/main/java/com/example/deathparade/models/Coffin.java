@@ -6,11 +6,11 @@ package com.example.deathparade.models;
 
 public class Coffin {
   public final String outsideColor;
-  public String outsideMaterial;
-  public String insideMaterial;
-  public String insideColor;
+  public final String outsideMaterial;
+  public final String insideMaterial;
+  public final String insideColor;
   public CoffinParameters parameters;
-  public int cost;
+  public final int cost;
   /**.
    *
    */
@@ -21,6 +21,7 @@ public class Coffin {
     this.outsideMaterial = outsideMaterial;
     this.insideMaterial = insideMaterial;
     this.insideColor = insideColor;
+    this.parameters = parameters;
     this.cost = cost;
   }
 

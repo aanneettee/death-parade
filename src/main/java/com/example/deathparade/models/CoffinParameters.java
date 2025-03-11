@@ -4,12 +4,7 @@ package com.example.deathparade.models;
  *
  */
 
-public enum CoffinMaterial {
-    CINK,
-    GOLD
-}
-
-public enum CoffinParameters {
+public enum CoffinSize {
     STANDARD,
     EXPANDED,
     CHILD,

@@ -71,7 +71,7 @@ public class OrderService {
       throw new EntityNotFoundException(ErrorMessages.COFFIN_NOT_FOUND);
     }
 
-    Order order = orderMapper.toEntity(dto, user, coffins);
+    Order order = orderMapper.toEntity(user, coffins);
     return orderMapper.toResponseDto(orderRepository.save(order));
   }
 

@@ -1,13 +1,14 @@
 package com.example.deathparade.models;
 
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,25 +19,25 @@ import lombok.Setter;
 /**
  * .
  */
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "coffins")
-public class Coffin {
+@Table(name = "users")
+public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String outsideColor;
-  private String outsideMaterial;
-  private String insideColor;
-  private String insideMaterial;
-  private String parameters;
-  private BigDecimal cost;
+  private String name;
+  private String email;
 
-  @ManyToMany(mappedBy = "coffins", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+          orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Order> orders = new ArrayList<>();
 
-
 }
+
+
+

@@ -8,17 +8,22 @@ import com.example.deathparade.models.dto.response.CoffinResponseDto;
 import com.example.deathparade.repositories.CoffinRepository;
 import com.example.deathparade.services.mappers.CoffinMapper;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 
 /**.
  *
  */
+
 @Service
 public class CoffinService {
   private final CoffinRepository coffinRepository;
   private final CoffinMapper coffinMapper;
+
+  /**.
+   *
+   */
 
   public CoffinService(CoffinRepository coffinRepository, CoffinMapper coffinMapper) {
     this.coffinRepository = coffinRepository;
@@ -30,17 +35,29 @@ public class CoffinService {
             .map(coffinMapper::toResponseDto).toList();
   }
 
+  /**.
+   *
+   */
+
   public CoffinResponseDto getCoffinById(Long id) {
     Coffin coffin = coffinRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.COFFIN_NOT_FOUND));
-  return coffinMapper.toResponseDto(coffin);
+    return coffinMapper.toResponseDto(coffin);
   }
+
+  /**.
+   *
+   */
 
   @Transactional
   public CoffinResponseDto createCoffin(CoffinRequestDto dto) {
     Coffin coffin = coffinMapper.toEntity(dto);
     return coffinMapper.toResponseDto(coffinRepository.save(coffin));
   }
+
+  /**.
+   *
+   */
 
   @Transactional
   public CoffinResponseDto updateCoffin(Long id, CoffinRequestDto dto) {
@@ -55,8 +72,12 @@ public class CoffinService {
     return coffinMapper.toResponseDto(coffinRepository.save(coffin));
   }
 
+  /**.
+   *
+   */
+
   @Transactional
-  public void deleteCoffins(Long id){
+  public void deleteCoffins(Long id) {
     coffinRepository.deleteById(id);
   }
 }

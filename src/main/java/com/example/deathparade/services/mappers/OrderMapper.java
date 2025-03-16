@@ -5,9 +5,10 @@ import com.example.deathparade.models.Order;
 import com.example.deathparade.models.User;
 import com.example.deathparade.models.dto.request.OrderRequestDto;
 import com.example.deathparade.models.dto.response.OrderResponseDto;
-import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
+
 
 /**.
  *
@@ -17,9 +18,18 @@ import java.util.stream.Collectors;
 public class OrderMapper {
 
   private final CoffinMapper coffinMapper;
+
+  /**.
+   *
+   */
+
   public OrderMapper(CoffinMapper coffinMapper) {
     this.coffinMapper = coffinMapper;
   }
+
+  /**.
+   *
+   */
 
   public Order toEntity(OrderRequestDto dto, User user, List<Coffin> coffins) {
     Order order = new Order();
@@ -28,6 +38,10 @@ public class OrderMapper {
     order.setCoffins(coffins);
     return order;
   }
+
+  /**.
+   *
+   */
 
   public OrderResponseDto toResponseDto(Order order) {
     return new OrderResponseDto(

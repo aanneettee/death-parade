@@ -1,5 +1,6 @@
 package com.example.deathparade.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -35,7 +36,8 @@ public class Coffin {
   private String parameters;
   private BigDecimal cost;
 
-  @ManyToMany(mappedBy = "coffins", fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+      CascadeType.ALL, CascadeType.DETACH}, mappedBy = "coffins", fetch = FetchType.LAZY)
   private List<Order> orders = new ArrayList<>();
 
 

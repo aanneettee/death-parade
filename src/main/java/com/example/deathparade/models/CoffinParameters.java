@@ -4,8 +4,10 @@ package com.example.deathparade.models;
  *
  */
 
-public enum CoffinParameters {
+public enum CoffinSize {
     STANDARD,
     EXPANDED,
-    CHILD
+    CHILD,
+    DOG, 
+    HAMSTER
 }

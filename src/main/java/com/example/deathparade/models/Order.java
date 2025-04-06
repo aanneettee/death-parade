@@ -46,8 +46,7 @@ public class Order {
       name = "order_coffins",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "coffin_id")
-    )
+  )
   private List<Coffin> coffins = new ArrayList<>();
-
 
 }

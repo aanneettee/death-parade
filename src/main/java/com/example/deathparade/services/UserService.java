@@ -1,7 +1,7 @@
 package com.example.deathparade.services;
 
-import com.example.deathparade.exceptions.EntityNotFoundException;
 import com.example.deathparade.exceptions.ErrorMessages;
+import com.example.deathparade.exceptions.NotFoundException;
 import com.example.deathparade.models.User;
 import com.example.deathparade.models.dto.request.UserRequestDto;
 import com.example.deathparade.models.dto.response.UserResponseDto;
@@ -41,7 +41,7 @@ public class UserService {
 
   public UserResponseDto getUserById(Long id) {
     User user = userRepository.findById(id)
-              .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
+              .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
     return userMapper.toResponseDto(user);
   }
 
@@ -62,7 +62,7 @@ public class UserService {
   @Transactional
   public UserResponseDto updateUser(Long id, UserRequestDto dto) {
     User user = userRepository.findById(id).orElseThrow(()
-            -> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
+            -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
     user.setName(dto.getName());
     user.setEmail(dto.getEmail());
     return userMapper.toResponseDto(userRepository.save(user));

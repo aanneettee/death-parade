@@ -36,9 +36,7 @@ public class Coffin {
   private String parameters;
   private BigDecimal cost;
 
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-      CascadeType.ALL, CascadeType.DETACH}, mappedBy = "coffins", fetch = FetchType.LAZY)
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH},
+          mappedBy = "coffins", fetch = FetchType.LAZY)
   private List<Order> orders = new ArrayList<>();
-
-
 }

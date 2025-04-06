@@ -1,7 +1,8 @@
 package com.example.deathparade.services;
 
-import com.example.deathparade.exceptions.EntityNotFoundException;
+import com.example.deathparade.cache.OrderCache;
 import com.example.deathparade.exceptions.ErrorMessages;
+import com.example.deathparade.exceptions.NotFoundException;
 import com.example.deathparade.models.Coffin;
 import com.example.deathparade.models.Order;
 import com.example.deathparade.models.User;
@@ -15,25 +16,32 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Сервис для управления заказами.
+/**.
+ *
  */
+
 @Service
 public class OrderService {
+
   private final OrderRepository orderRepository;
   private final UserRepository userRepository;
   private final CoffinRepository coffinRepository;
   private final OrderMapper orderMapper;
-
+  private final OrderCache orderCache;
   /**
-   * Конструктор сервиса заказов.
-   */
-  public OrderService(OrderRepository orderRepository, UserRepository userRepository,
-                        CoffinRepository coffinRepository, OrderMapper orderMapper) {
+  * Конструктор сервиса заказов.
+  */
+
+  public OrderService(OrderRepository orderRepository,
+                      UserRepository userRepository,
+                      CoffinRepository coffinRepository,
+                      OrderMapper orderMapper,
+                      OrderCache orderCache) {
     this.orderRepository = orderRepository;
-    this.userRepository = userRepository;
     this.coffinRepository = coffinRepository;
     this.orderMapper = orderMapper;
+    this.userRepository = userRepository;
+    this.orderCache = new OrderCache();
   }
 
   /**.
@@ -42,8 +50,8 @@ public class OrderService {
 
   public List<OrderResponseDto> getAllOrders() {
     return orderRepository.findAll().stream()
-                .map(orderMapper::toResponseDto)
-                .toList();
+            .map(orderMapper::toResponseDto)
+            .toList();
   }
 
   /**.
@@ -51,8 +59,14 @@ public class OrderService {
    */
 
   public OrderResponseDto getOrderById(Long id) {
+    Order cachedOrder = orderCache.get(id);
+    if (cachedOrder != null) {
+      return orderMapper.toResponseDto(cachedOrder);
+    }
+
     Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.ORDER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.ORDER_NOT_FOUND));
+    orderCache.put(id, order);
     return orderMapper.toResponseDto(order);
   }
 
@@ -60,18 +74,46 @@ public class OrderService {
    *
    */
 
+  public List<OrderResponseDto> findOrderByUserId(Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
+
+    List<Order> orders = orderRepository.findOrderByUserId(userId);
+
+    return orders.stream()
+            .map(orderMapper::toResponseDto)
+            .toList();
+  }
+
+  /**.
+   *
+   */
+
+  public List<OrderResponseDto> findOrderByUserIdNative(Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
+
+    List<Order> orders = orderRepository.findOrderByUserIdNative(userId);
+
+    return orders.stream()
+            .map(orderMapper::toResponseDto)
+            .toList();
+  }
+  /**.
+   *
+   */
+
   @Transactional
   public OrderResponseDto createOrder(OrderRequestDto dto) {
     User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
 
     List<Coffin> coffins = coffinRepository.findAllById(dto.getCoffinIds());
-
-    if (coffins.isEmpty()) {
-      throw new EntityNotFoundException(ErrorMessages.COFFIN_NOT_FOUND);
+    if (coffins.size() != dto.getCoffinIds().size()) {
+      throw new NotFoundException(ErrorMessages.COFFIN_NOT_FOUND);
     }
 
-    Order order = orderMapper.toEntity(user, coffins);
+    Order order = orderMapper.toEntity(dto, user, coffins);
     return orderMapper.toResponseDto(orderRepository.save(order));
   }
 
@@ -82,21 +124,25 @@ public class OrderService {
   @Transactional
   public OrderResponseDto updateOrder(Long id, OrderRequestDto dto) {
     Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.ORDER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessages.ORDER_NOT_FOUND));
 
-    User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
-
-    List<Coffin> coffins = coffinRepository.findAllById(dto.getCoffinIds());
-
-    if (coffins.isEmpty()) {
-      throw new EntityNotFoundException(ErrorMessages.COFFIN_NOT_FOUND);
+    if (dto.getUserId() != null) {
+      User user = userRepository.findById(dto.getUserId())
+              .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
+      order.setUser(user);
     }
 
-    order.setUser(user);
-    order.setCoffins(coffins);
+    if (dto.getCoffinIds() != null && !dto.getCoffinIds().isEmpty()) {
+      List<Coffin> coffins = coffinRepository.findAllById(dto.getCoffinIds());
+      if (coffins.size() != dto.getCoffinIds().size()) {
+        throw new NotFoundException(ErrorMessages.COFFIN_NOT_FOUND);
+      }
+      order.setCoffins(coffins);
+    }
+    Order savedOrder = orderRepository.save(order);
+    orderCache.put(savedOrder.getId(), savedOrder);
 
-    return orderMapper.toResponseDto(orderRepository.save(order));
+    return orderMapper.toResponseDto(savedOrder);
   }
 
   /**.
@@ -106,8 +152,9 @@ public class OrderService {
   @Transactional
   public void deleteOrder(Long id) {
     if (!orderRepository.existsById(id)) {
-      throw new EntityNotFoundException(ErrorMessages.ORDER_NOT_FOUND);
+      throw new NotFoundException(ErrorMessages.ORDER_NOT_FOUND);
     }
     orderRepository.deleteById(id);
+    orderCache.remove(id);
   }
 }

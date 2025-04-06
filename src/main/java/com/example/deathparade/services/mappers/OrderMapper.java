@@ -31,7 +31,7 @@ public class OrderMapper {
    *
    */
 
-  public Order toEntity(User user, List<Coffin> coffins) {
+  public Order toEntity(OrderRequestDto dto, User user, List<Coffin> coffins) {
     Order order = new Order();
     order.setOrderDate(java.time.LocalDateTime.now());
     order.setUser(user);

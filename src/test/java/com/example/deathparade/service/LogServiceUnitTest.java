@@ -4,13 +4,13 @@ import com.example.deathparade.exceptions.InternalServerErrorException;
 import com.example.deathparade.exceptions.NotFoundException;
 import com.example.deathparade.exceptions.BadRequestException;
 import com.example.deathparade.services.LogService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import java.io.BufferedReader;
@@ -21,12 +21,9 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class LogServiceUnitTest {

@@ -106,7 +106,7 @@ public class OrderService {
       new NotFoundException(ErrorMessages.USER_NOT_FOUND));
 
     List<Coffin> coffins = coffinRepository.findAllById(dto.getCoffinIds());
-    Order order = orderMapper.toEntity(dto, user, coffins);
+    Order order = orderMapper.toEntity(user, coffins);
     return orderMapper.toResponseDto(orderRepository.save(order));
   }
 

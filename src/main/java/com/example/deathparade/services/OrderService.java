@@ -41,7 +41,7 @@ public class OrderService {
     this.coffinRepository = coffinRepository;
     this.orderMapper = orderMapper;
     this.userRepository = userRepository;
-    this.orderCache = new OrderCache();
+    this.orderCache = orderCache;
   }
 
   /**.
@@ -75,13 +75,12 @@ public class OrderService {
    */
 
   public List<OrderResponseDto> findOrderByUserId(Long userId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
 
-    List<Order> orders = orderRepository.findOrderByUserId(userId);
+    if (!userRepository.existsById(userId)) {
+      throw new NotFoundException(ErrorMessages.USER_NOT_FOUND);
+    }
 
-    return orders.stream()
-            .map(orderMapper::toResponseDto)
+    return orderRepository.findOrderByUserId(userId).stream().map(orderMapper::toResponseDto)
             .toList();
   }
 
@@ -90,13 +89,11 @@ public class OrderService {
    */
 
   public List<OrderResponseDto> findOrderByUserIdNative(Long userId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
+    if (!userRepository.existsById(userId)) {
+      throw new NotFoundException(ErrorMessages.USER_NOT_FOUND);
+    }
 
-    List<Order> orders = orderRepository.findOrderByUserIdNative(userId);
-
-    return orders.stream()
-            .map(orderMapper::toResponseDto)
+    return orderRepository.findOrderByUserIdNative(userId).stream().map(orderMapper::toResponseDto)
             .toList();
   }
   /**.
@@ -105,14 +102,10 @@ public class OrderService {
 
   @Transactional
   public OrderResponseDto createOrder(OrderRequestDto dto) {
-    User user = userRepository.findById(dto.getUserId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessages.USER_NOT_FOUND));
+    User user = userRepository.findById(dto.getUserId()).orElseThrow(() ->
+      new NotFoundException(ErrorMessages.USER_NOT_FOUND));
 
     List<Coffin> coffins = coffinRepository.findAllById(dto.getCoffinIds());
-    if (coffins.size() != dto.getCoffinIds().size()) {
-      throw new NotFoundException(ErrorMessages.COFFIN_NOT_FOUND);
-    }
-
     Order order = orderMapper.toEntity(dto, user, coffins);
     return orderMapper.toResponseDto(orderRepository.save(order));
   }
